@@ -33,6 +33,8 @@ const options = {
 // get cubes X,Y,Z rotation options, save to options object
 function getCubesToRotate(e) {
 
+  // TODO:: find target side for Z transform as some cubes are on multiple Z axis'
+  let targetSide = null
   let targetCube = null
   // if target is cube, set target, otherwise target is face, get parent which is cube
   if (e.target.classList.contains('cube')) {
@@ -69,41 +71,49 @@ function testGroup(array, targetIndex) {
 // either positive or negative direction
 // then we need to update the data-indexes back to correct order
 let deg = 0
+let X = 0
+let Y = 0
+let Z = 0
 document.addEventListener('keydown', (e) => {
   switch(e.key) {
-    case 'w':
+    case 'e':
       deg += 90
-      // init val: translateX(0) translateZ(100px)
-      cubes[0].style.transform = `translateX(200px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateX(100px) translateZ(100px)
-      cubes[1].style.transform = `translateX(200px) translateY(100px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(0) translateX(200px) translateZ(100px)
-      cubes[2].style.transform = `translateX(200px) translateY(200px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(100px) translateX(0) translateZ(100px)
-      cubes[3].style.transform = `translateX(100px) translateY(0) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(100px) translateX(100px) translateZ(100px)
-      cubes[4].style.transform = `translateX(100px) translateY(100px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(100px) translateX(200px) translateZ(100px)
-      cubes[5].style.transform = `translateX(100px) translateY(200px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(200px) translateX(0) translateZ(100px)
-      cubes[6].style.transform = `translateX(0) translateY(0) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(200px) translateX(100px) translateZ(100px)
-      cubes[7].style.transform = `translateX(0) translateY(100px) translateZ(100px) rotateZ(${deg}deg)`
-      // init val: translateY(200px) translateX(200px) translateZ(100px)
-      cubes[8].style.transform = `translateX(0) translateY(200px) translateZ(100px) rotateZ(${deg}deg)`
+      X = 200
+      Y = 0
+      Z = 100
+      options.zAxis.forEach((value, i) => {
+        // x = 200,200,200,100,100,100,0,0,0
+        // y = 0,100,200,0,100,200,0,100,200
+        // z = 100... 
+        if (Y > 200) Y = 0
+        if (i%3 === 0 && i !== 0) X -=100
+        cubes[value-1].style.transform = `translateX(${X}px) translateY(${Y}px) translateZ(${Z}px) rotateZ(${deg}deg)`
+        Y += 100
+      })
       break;
-    case 's':
-      deg -= 90
-
-      break;
+      case 'q':
+        deg -= 90
+        X = 0
+        Y = 200
+        Z = 100
+        options.zAxis.forEach((value, i) => {
+          // x = 0,0,0,100,100,100,200,200,200
+          // y = 200,100,0,200,100,0,200,100,0
+          // z = 100... 
+          if (i%3 === 0 && i !== 0) X +=100
+          if (Y < 0) Y = 200
+          console.log(Y, X)
+          cubes[value-1].style.transform = `translateX(${X}px) translateY(${Y}px) translateZ(${Z}px) rotateZ(${deg}deg)`
+          Y -= 100
+        })
+        break;
     case 'a':
       deg -= 90
 
       break;
     case 'd':
       deg += 90
-      cubes.forEach(cube => {
-      })
+
       break;
     default:
       break;
